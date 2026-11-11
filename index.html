@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visit the Theatre: an accessible tour</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="top">
+    <a class="logo" href="./">Logo</a>
+    <nav class="menu" aria-label="Site">
+      <button type="button" class="link" id="settingsBtn" aria-expanded="false" aria-controls="settings">Accessibility Settings</button>
+      <button type="button" class="link" id="aboutBtn">Learn More</button>
+    </nav>
+  </header>
+
+  <!-- Accessibility settings -->
+  <section class="settings" id="settings" aria-label="Accessibility settings" hidden>
+    <h2>Accessibility Settings</h2>
+    <label><input type="checkbox" data-opt="lgText"> Larger text</label>
+    <label><input type="checkbox" data-opt="lgBtn"> Larger buttons</label>
+    <label><input type="checkbox" data-opt="hc"> High contrast</label>
+    <label><input type="checkbox" data-opt="calm"> Reduce motion</label>
+  </section>
+
+  <main class="viewport" id="viewport">
+    <div class="stage">
+      <img class="photo" src="img/theater.webp" alt="A wide stone plaza at sunset with a fountain in front of a theatre building with five tall arched windows. A banner hangs across the arches.">
+
+      <!-- x / y are percentages of the photo -->
+      <button class="spot" data-id="1" data-x="6.8"  data-y="86"   style="--x:6.8%;--y:86%">1</button>
+      <button class="spot" data-id="2" data-x="24.3" data-y="71.4" style="--x:24.3%;--y:71.4%">2</button>
+      <button class="spot" data-id="3" data-x="37.9" data-y="46.4" style="--x:37.9%;--y:46.4%">3</button>
+      <button class="spot" data-id="4" data-x="34.2" data-y="70"   style="--x:34.2%;--y:70%">4</button>
+      <button class="spot" data-id="5" data-x="49.1" data-y="80.8" style="--x:49.1%;--y:80.8%">5</button>
+      <button class="spot" data-id="6" data-x="70.4" data-y="71.4" style="--x:70.4%;--y:71.4%">6</button>
+      <button class="spot" data-id="7" data-x="87.3" data-y="79.1" style="--x:87.3%;--y:79.1%">7</button>
+    </div>
+  </main>
+
+  <p class="hint" id="hint">Select a numbered button to explore.</p>
+
+  <button type="button" class="next" id="nextBtn" aria-label="Next stop">
+    <svg viewBox="0 0 32 16" width="32" height="16" aria-hidden="true"><path d="M0 8h29M22 1l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+  </button>
+
+  <!-- Text popout -->
+  <aside class="popout" id="popout" role="dialog" aria-labelledby="popTitle" tabindex="-1" hidden>
+    <button type="button" class="close" id="close" aria-label="Close">&times;</button>
+    <h2 id="popTitle"></h2>
+    <p class="lead" id="popLead"></p>
+    <h3 id="popHeading">Making it more accessible</h3>
+    <ul id="popTips"></ul>
+    <button type="button" class="step" id="stepBtn">Next stop</button>
+  </aside>
+
+  <script>
+    const ORDER = ["1", "2", "3", "4", "5", "6", "7"];
+
+    const stops = {
+      "1": {
+        title: "The plaza",
+        lead: "A theatre visit starts long before the curtain, in the walk from the street to the door. A big open plaza makes arrival feel like part of the show. It can also be hard to read if you can't see well or you use a mobility device.",
+        tips: [
+          "Add tactile paving and high-contrast edges along the main route.",
+          "Put large-print signs at every decision point.",
+          "Use the same step-free route symbol all the way to the door."
+        ]
+      },
+      "2": {
+        title: "Rest stops",
+        lead: "People arrive early, wait for friends and linger after the show, so benches and ledges end up being the theatre's unofficial lobby.",
+        tips: [
+          "Place benches with backs and armrests at regular intervals.",
+          "Keep a few shaded, quieter spots for people who need a break.",
+          "Leave space beside benches for wheelchairs and strollers."
+        ]
+      },
+      "3": {
+        title: "The banner",
+        lead: "Banners and posters are a theatre's first sales pitch: the title, the dates and one striking image, seen from across the square.",
+        tips: [
+          "Repeat the banner's details as plain text on the website.",
+          "Use large type with strong contrast, and avoid text over busy images.",
+          "Offer the same information in large print and audio at the box office."
+        ]
+      },
+      "4": {
+        title: "The ticket booth",
+        lead: "The term box office is often traced back to the boxes in old theatres where payment was collected. The ticket booth is still where a visit becomes real. It's also where many people first hit a barrier: a high counter, a muffled window, a long line in the cold.",
+        tips: [
+          "Lower a section of the counter and keep knee space for wheelchair users.",
+          "Install a hearing loop, and keep a tablet or notepad at the window for written back-and-forth.",
+          "Let people book accessible seats, companion seats, and captioned or audio-described shows online and by phone, not only in person.",
+          "Offer a shorter or seated line during busy times."
+        ]
+      },
+      "5": {
+        title: "The fountain",
+        lead: "A fountain is a natural meeting point. \"Meet me by the water\" is easy to say and easy to find.",
+        tips: [
+          "Keep the path around it clear and step-free.",
+          "Splashing water is loud, so name a quieter backup meeting spot.",
+          "Offer seating at different heights around the edge."
+        ]
+      },
+      "6": {
+        title: "The entrance",
+        lead: "Tall glass doors and arches make the entrance feel grand. They also need to open for everyone without a fuss.",
+        tips: [
+          "Make the main entrance automatic or push-button, not just a side door.",
+          "Avoid heavy doors and raised thresholds.",
+          "Have greeters in clearly marked jackets who can guide people inside."
+        ]
+      },
+      "7": {
+        title: "Drop-off and arrival",
+        lead: "Many visitors arrive by car, taxi or paratransit, and the last hundred feet matter most.",
+        tips: [
+          "Mark an accessible drop-off zone close to the entrance with a level curb cut.",
+          "Provide staff with wheelchairs for longer distances.",
+          "Post arrival directions with photos before the visit."
+        ]
+      }
+    };
+
+    const about = {
+      title: "Learn more",
+      lead: "This is a short tour of a theatre, from the plaza to the ticket booth. Each numbered stop has a few lines about the place and ideas for making it work for more people.",
+      heading: "How to use it",
+      tips: [
+        "Select any numbered button, or press the arrow to go stop by stop.",
+        "On a keyboard, use Tab to move between buttons and Enter to open one.",
+        "Open Accessibility Settings to change text size, contrast and motion."
+      ]
+    };
+
+    const $ = id => document.getElementById(id);
+    const pop = $("popout"), viewport = $("viewport"), settings = $("settings");
+    const spots = [...document.querySelectorAll(".spot")];
+    const seen = new Set();
+    let current = null, lastTrigger = null;
+
+    const calmNow = () => document.documentElement.classList.contains("calm") ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // label each button from the stop data
+    spots.forEach(s => { s.setAttribute("aria-label", s.dataset.id + ". " + stops[s.dataset.id].title); });
+
+    function fill(d, heading) {
+      $("popTitle").textContent = d.title;
+      $("popLead").textContent = d.lead;
+      $("popHeading").textContent = heading;
+      const ul = $("popTips");
+      ul.replaceChildren(...d.tips.map(t => Object.assign(document.createElement("li"), { textContent: t })));
+    }
+
+    function openPop(side) {
+      pop.classList.toggle("left", side === "left");
+      pop.classList.toggle("right", side !== "left");
+      pop.hidden = false;
+      pop.classList.remove("show"); void pop.offsetWidth; pop.classList.add("show");
+      document.body.classList.add("has-pop");
+      pop.scrollTop = 0;
+      pop.focus({ preventScroll: true });
+    }
+
+    function openStop(id, trigger) {
+      const spot = spots.find(s => s.dataset.id === id);
+      current = id;
+      lastTrigger = trigger || spot;
+      fill(stops[id], "Making it more accessible");
+      $("stepBtn").hidden = false;
+      spots.forEach(s => s.classList.toggle("active", s === spot));
+      spot.classList.add("seen");
+      seen.add(id);
+      $("hint").textContent = seen.size + " of " + ORDER.length + " stops explored.";
+      spot.scrollIntoView({ inline: "center", block: "nearest", behavior: calmNow() ? "auto" : "smooth" });
+      openPop(parseFloat(spot.dataset.x) < 50 ? "right" : "left");
+    }
+
+    function openAbout() {
+      current = null;
+      lastTrigger = $("aboutBtn");
+      fill(about, about.heading);
+      $("stepBtn").hidden = true;
+      spots.forEach(s => s.classList.remove("active"));
+      closeSettings();
+      openPop("right");
+    }
+
+    function closePop() {
+      if (pop.hidden) return;
+      pop.hidden = true;
+      current = null;
+      document.body.classList.remove("has-pop");
+      spots.forEach(s => s.classList.remove("active"));
+      if (lastTrigger) lastTrigger.focus({ preventScroll: true });
+    }
+
+    function nextStop() {
+      const i = current ? ORDER.indexOf(current) : -1;
+      openStop(ORDER[(i + 1) % ORDER.length], $("nextBtn"));
+    }
+
+    spots.forEach(s => s.addEventListener("click", () => openStop(s.dataset.id, s)));
+    $("close").addEventListener("click", closePop);
+    $("nextBtn").addEventListener("click", nextStop);
+    $("stepBtn").addEventListener("click", nextStop);
+    $("aboutBtn").addEventListener("click", openAbout);
+
+    // settings panel
+    function closeSettings() {
+      settings.hidden = true;
+      $("settingsBtn").setAttribute("aria-expanded", "false");
+    }
+    $("settingsBtn").addEventListener("click", () => {
+      const open = settings.hidden;
+      if (open) closePop();
+      settings.hidden = !open;
+      $("settingsBtn").setAttribute("aria-expanded", String(open));
+    });
+
+    const root = document.documentElement;
+    let prefs = {};
+    try { prefs = JSON.parse(localStorage.getItem("theatre-a11y") || "{}"); } catch (e) {}
+    document.querySelectorAll("[data-opt]").forEach(box => {
+      const k = box.dataset.opt;
+      box.checked = !!prefs[k];
+      root.classList.toggle(k === "calm" ? "calm" : k, box.checked);
+      box.addEventListener("change", () => {
+        prefs[k] = box.checked;
+        root.classList.toggle(k === "calm" ? "calm" : k, box.checked);
+        try { localStorage.setItem("theatre-a11y", JSON.stringify(prefs)); } catch (e) {}
+      });
+    });
+
+    // close on Escape or outside click
+    document.addEventListener("keydown", e => {
+      if (e.key !== "Escape") return;
+      if (!settings.hidden) { closeSettings(); $("settingsBtn").focus(); }
+      else closePop();
+    });
+    document.addEventListener("click", e => {
+      const t = e.target;
+      if (!pop.hidden && !t.closest(".popout, .spot, .next, #aboutBtn")) closePop();
+      if (!settings.hidden && !t.closest(".settings, #settingsBtn")) closeSettings();
+    });
+
+    // on narrow screens the photo scrolls sideways; start in the middle
+    addEventListener("load", () => {
+      viewport.scrollLeft = (viewport.scrollWidth - viewport.clientWidth) / 2;
+    });
+  </script>
+</body>
+</html>
